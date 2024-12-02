@@ -1,6 +1,8 @@
+import 'package:calcolatrice/bloc/calculator_bloc.dart';
 import 'package:calcolatrice/theme.dart';
 import 'package:calcolatrice/view/calculator_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(const MainApp());
@@ -16,9 +18,19 @@ class MainApp extends StatelessWidget {
       theme: theme,
       home: Scaffold(
         body: SafeArea(
-          child: CalculatorView(changeTheme: (val) {
-            theme = val == 1 ? darkMode() : lightMode();
-          }),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => CalculatorBloc(),
+              ),
+              /* BlocProvider(
+                create: (context) => SubjectBloc(),
+              ), */
+            ],
+            child: CalculatorView(changeTheme: (val) {
+              theme = val == 1 ? darkMode() : lightMode();
+            }),
+          ),
         ),
       ),
     );

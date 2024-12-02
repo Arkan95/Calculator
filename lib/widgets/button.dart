@@ -1,6 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:calcolatrice/bloc/calculator_bloc.dart';
 import 'package:calcolatrice/models/element.dart';
+import 'package:calcolatrice/utility.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ButtonCalculator extends StatelessWidget {
@@ -8,16 +11,15 @@ class ButtonCalculator extends StatelessWidget {
 
   ButtonCalculator({super.key, required this.value});
 
-  Color getColor(Type type) {
-    switch (type) {
-      case (Type.number):
-        return Colors.white;
-      case (Type.operator):
-        return const Color.fromRGBO(237, 103, 103, 1);
-      case (Type.soperator):
-        return const Color.fromRGBO(38, 242, 205, 1);
-      default:
-        return Colors.white;
+  void onPressed(ElementValue value, BuildContext context) {
+    if (value.value == "=") {
+      context.read<CalculatorBloc>().add(CalculatorEqualElementPressed());
+    } else if (value.value == "AC") {
+      context.read<CalculatorBloc>().add(CalculatorDeleteElementPressed());
+    } else if (value.value == "DEL") {
+      context.read<CalculatorBloc>().add(CalculatorResetElementPressed());
+    } else {
+      context.read<CalculatorBloc>().add(CalculatorAddElementPressed(value));
     }
   }
 
@@ -30,7 +32,9 @@ class ButtonCalculator extends StatelessWidget {
         backgroundColor: theme.scaffoldBackgroundColor,
         disabledBackgroundColor: Colors.red,
       ),
-      onPressed: () {},
+      onPressed: () {
+        onPressed(value, context);
+      },
       child: value.icon != null
           ? Icon(
               value.icon!,
@@ -38,8 +42,8 @@ class ButtonCalculator extends StatelessWidget {
             )
           : AutoSizeText(
               maxLines: 1,
-              minFontSize: 21,
-              maxFontSize: 32,
+              minFontSize: 27,
+              maxFontSize: 39,
               value.value!,
               style: GoogleFonts.quicksand(
                   fontWeight: FontWeight.bold, color: getColor(value.type!))),
