@@ -33,7 +33,7 @@ class _CalculatorViewState extends State<CalculatorView> {
       type: Tipo.soperator,
     ));
     elements.add(ElementValue(
-        value: "%", type: Tipo.soperator, icon: FontAwesomeIcons.percent));
+        value: "±", type: Tipo.soperator, icon: FontAwesomeIcons.plusMinus));
     elements.add(ElementValue(
         value: "÷", type: Tipo.operator, icon: FontAwesomeIcons.divide));
     for (int i = 7; i < 10; i++) {

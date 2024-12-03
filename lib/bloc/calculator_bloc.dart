@@ -31,6 +31,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     } else if (nuovo.type == Tipo.operator) {
       if (state.elements!.isNotEmpty) {
         //Se l'ultimo elemento inserito non è un operatore e se la lista non è vuota
+
         if (list!.last.type != Tipo.operator) {
           list.add(nuovo);
           emit(CalculatorAddElement(elementi: list));
@@ -52,7 +53,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           nuovo.value = ")";
         }
       }
-      if (nuovo.value == "%") {}
+
       list!.add(nuovo);
       emit(CalculatorAddElement(elementi: list));
     }
