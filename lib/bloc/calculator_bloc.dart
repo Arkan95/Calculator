@@ -52,10 +52,18 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         } else {
           nuovo.value = ")";
         }
+        list!.add(nuovo);
+      } else if (nuovo.value == "±") {
+        if (list!.isEmpty) {
+          list.add(ElementValue(type: Tipo.number, value: "-"));
+        } else if (list!.last.value == "-" && list!.last.type == Tipo.number) {
+          list.removeLast();
+        } else {
+          list.add(ElementValue(type: Tipo.number, value: "-"));
+        }
       }
 
-      list!.add(nuovo);
-      emit(CalculatorAddElement(elementi: list));
+      emit(CalculatorAddElement(elementi: list!));
     }
   }
 
@@ -70,76 +78,101 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
   void onEqual(CalculatorEvent evento, Emitter<CalculatorState> emit) {
     try {
-      if (state.elements!.last.type == Tipo.number) {
-        //Creo una lista dinamica di double e string(Le operazioni)
-        List<dynamic> listaDaUsare = [];
-        List<ElementValue> lista = state.elements!;
-        String stringSupport = "";
-        for (int i = 0; i < lista.length; i++) {
-          if (lista[i].type == Tipo.number) {
-            stringSupport += lista[i].value!;
-            if (i == lista.length - 1) {
-              double temp = double.parse(stringSupport);
-              listaDaUsare.add(temp);
-              stringSupport = "";
+      //Creo una lista dinamica di double e string(Le operazioni)
+      List<dynamic> listaDaUsare = [];
+      List<ElementValue> lista = state.elements!;
+      String stringSupport = "";
+      for (int i = 0; i < lista.length; i++) {
+        if (lista[i].type == Tipo.number) {
+          int j = i;
+          for (j; j < lista.length; j++) {
+            if (lista[j].type == Tipo.number) {
+              stringSupport += lista[j].value!;
+            } else {
+              break;
             }
-          } else if (lista[i].type == Tipo.operator) {
-            double temp = double.parse(stringSupport);
-            listaDaUsare.add(temp);
-            listaDaUsare.add(lista[i].value);
-            stringSupport = "";
           }
-        }
+          double temp = double.parse(stringSupport);
+          listaDaUsare.add(temp);
 
-        //Cerco prima se ci sono le operazioni di moltiplicazione e divisione
-        while (listaDaUsare.contains("X")) {
-          int index = listaDaUsare.indexOf("X");
-          double subResult =
-              (listaDaUsare[index - 1]) * (listaDaUsare[index + 1]);
-          //Eseguo le operazioni e tolgo dalla lista l'operazione unendo i due numeri
-          listaDaUsare[index] = subResult;
-          listaDaUsare.removeAt(index - 1);
-          listaDaUsare.removeAt(index);
+          stringSupport = "";
+          i = j - 1;
+        } else {
+          listaDaUsare.add(lista[i].value);
         }
-        //Faccio la stessa cosa per la divisione, somma e differenza
-        while (listaDaUsare.contains("÷")) {
-          int index = listaDaUsare.indexOf("÷");
-          double subResult =
-              (listaDaUsare[index - 1]) / (listaDaUsare[index + 1]);
-          listaDaUsare[index] = subResult;
-          listaDaUsare.removeAt(index - 1);
-          listaDaUsare.removeAt(index);
-        }
-
-        while (listaDaUsare.contains("+")) {
-          int index = listaDaUsare.indexOf("+");
-          double subResult =
-              (listaDaUsare[index - 1]) + (listaDaUsare[index + 1]);
-          listaDaUsare[index] = subResult;
-          listaDaUsare.removeAt(index - 1);
-
-          listaDaUsare.removeAt(index);
-        }
-        while (listaDaUsare.contains("-")) {
-          int index = listaDaUsare.indexOf("-");
-          double subResult =
-              (listaDaUsare[index - 1]) - (listaDaUsare[index + 1]);
-          listaDaUsare[index] = subResult;
-          listaDaUsare.removeAt(index - 1);
-          listaDaUsare.removeAt(index);
-        }
-
-        ElementValue result = ElementValue(
-            value: listaDaUsare.first.toStringAsFixed(2), type: Tipo.number);
-        lista.clear();
-        lista.add(result);
-        emit(CalculatorEqual(elementi: lista));
       }
+      while (listaDaUsare.contains("(") && listaDaUsare.contains(")")) {
+        int startIndex = listaDaUsare.indexOf("(");
+        int lastIndex = listaDaUsare.indexOf(")");
+        double result =
+            calcoli(listaDaUsare.sublist(startIndex + 1, lastIndex));
+        listaDaUsare.insert(startIndex, result);
+        listaDaUsare.removeRange(startIndex + 1, lastIndex + 2);
+      }
+      double result = calcoli(listaDaUsare);
+      ElementValue resultFinal;
+      if (hasDecimal(result)) {
+        resultFinal = ElementValue(
+            //value: result.toStringAsFixed(2),
+            value: result.toStringAsFixed(2),
+            type: Tipo.number);
+      } else {
+        resultFinal = ElementValue(
+            //value: result.toStringAsFixed(2),
+            value: result.toStringAsFixed(0),
+            type: Tipo.number);
+      }
+
+      lista.clear();
+      lista.add(resultFinal);
+      emit(CalculatorEqual(elementi: lista));
     } catch (_) {
       List<ElementValue> vuoto = [];
 
       emit(CalculatorError(elementi: vuoto));
     }
+  }
+
+  bool hasDecimal(double number) {
+    // Verifica se il numero, senza la parte decimale, è diverso dal numero originale
+    return number != number.toInt();
+  }
+
+  double calcoli(List<dynamic> listaDaUsare) {
+    //Cerco prima se ci sono le operazioni di moltiplicazione e divisione
+    while (listaDaUsare.contains("X")) {
+      int index = listaDaUsare.indexOf("X");
+      double subResult = (listaDaUsare[index - 1]) * (listaDaUsare[index + 1]);
+      //Eseguo le operazioni e tolgo dalla lista l'operazione unendo i due numeri
+      listaDaUsare[index] = subResult;
+      listaDaUsare.removeAt(index - 1);
+      listaDaUsare.removeAt(index);
+    }
+    //Faccio la stessa cosa per la divisione, somma e differenza
+    while (listaDaUsare.contains("÷")) {
+      int index = listaDaUsare.indexOf("÷");
+      double subResult = (listaDaUsare[index - 1]) / (listaDaUsare[index + 1]);
+      listaDaUsare[index] = subResult;
+      listaDaUsare.removeAt(index - 1);
+      listaDaUsare.removeAt(index);
+    }
+
+    while (listaDaUsare.contains("+")) {
+      int index = listaDaUsare.indexOf("+");
+      double subResult = (listaDaUsare[index - 1]) + (listaDaUsare[index + 1]);
+      listaDaUsare[index] = subResult;
+      listaDaUsare.removeAt(index - 1);
+
+      listaDaUsare.removeAt(index);
+    }
+    while (listaDaUsare.contains("-")) {
+      int index = listaDaUsare.indexOf("-");
+      double subResult = (listaDaUsare[index - 1]) - (listaDaUsare[index + 1]);
+      listaDaUsare[index] = subResult;
+      listaDaUsare.removeAt(index - 1);
+      listaDaUsare.removeAt(index);
+    }
+    return listaDaUsare.first;
   }
 
   void onReset(CalculatorEvent evento, Emitter<CalculatorState> emit) {

@@ -8,9 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class CalculatorView extends StatefulWidget {
-  Function(int val)? changeTheme;
-
-  CalculatorView({super.key, this.changeTheme});
+  CalculatorView({super.key});
 
   @override
   State<CalculatorView> createState() => _CalculatorViewState();

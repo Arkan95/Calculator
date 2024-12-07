@@ -1,4 +1,5 @@
 import 'package:calcolatrice/bloc/calculator_bloc.dart';
+import 'package:calcolatrice/bloc/theme_bloc_bloc.dart';
 import 'package:calcolatrice/models/element.dart';
 import 'package:calcolatrice/utility.dart';
 import 'package:flutter/material.dart';
@@ -13,26 +14,57 @@ class DisplayView extends StatefulWidget {
 }
 
 class _DisplayViewState extends State<DisplayView> {
+  Color getColor(Tipo type) {
+    switch (type) {
+      case (Tipo.number):
+        return Theme.of(context).secondaryHeaderColor;
+      case (Tipo.operator):
+        return const Color.fromRGBO(237, 103, 103, 1);
+      case (Tipo.soperator):
+        return const Color.fromRGBO(38, 242, 205, 1);
+      default:
+        return Colors.white;
+    }
+  }
+
   Widget changeMode() {
-    return Container(
-      width: 120,
-      height: 50,
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          color: Theme.of(context).primaryColor),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.dark_mode_outlined),
-            onPressed: () {},
+    return BlocBuilder<ThemeBlocBloc, ThemeBlocState>(
+      builder: (context, state) {
+        return Container(
+          width: 120,
+          height: 50,
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              color: Theme.of(context).primaryColor),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.dark_mode_outlined),
+                isSelected: (state is ThemeBlocDark) ? true : false,
+                selectedIcon: const Icon(
+                  Icons.dark_mode_outlined,
+                  color: Colors.blue,
+                ),
+                onPressed: () {
+                  context.read<ThemeBlocBloc>().add(ChangeToDark());
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.light_mode_outlined),
+                selectedIcon: const Icon(
+                  Icons.light_mode_outlined,
+                  color: Colors.orange,
+                ),
+                isSelected: (state is ThemeBlocLight) ? true : false,
+                onPressed: () {
+                  context.read<ThemeBlocBloc>().add(ChangeToLight());
+                },
+              )
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.light_mode_outlined),
-            onPressed: () {},
-          )
-        ],
-      ),
+        );
+      },
     );
   }
 

@@ -23,6 +23,19 @@ class ButtonCalculator extends StatelessWidget {
     }
   }
 
+  Color getColor(Tipo type, BuildContext context) {
+    switch (type) {
+      case (Tipo.number):
+        return Theme.of(context).secondaryHeaderColor;
+      case (Tipo.operator):
+        return const Color.fromRGBO(237, 103, 103, 1);
+      case (Tipo.soperator):
+        return const Color.fromRGBO(38, 242, 205, 1);
+      default:
+        return Colors.white;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -38,7 +51,7 @@ class ButtonCalculator extends StatelessWidget {
       child: value.icon != null
           ? Icon(
               value.icon!,
-              color: getColor(value.type!),
+              color: getColor(value.type!, context),
             )
           : AutoSizeText(
               maxLines: 1,
@@ -46,7 +59,8 @@ class ButtonCalculator extends StatelessWidget {
               maxFontSize: 39,
               value.value!,
               style: GoogleFonts.quicksand(
-                  fontWeight: FontWeight.bold, color: getColor(value.type!))),
+                  fontWeight: FontWeight.bold,
+                  color: getColor(value.type!, context))),
     );
   }
 }

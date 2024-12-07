@@ -1,4 +1,5 @@
 import 'package:calcolatrice/bloc/calculator_bloc.dart';
+import 'package:calcolatrice/bloc/theme_bloc_bloc.dart';
 import 'package:calcolatrice/theme.dart';
 import 'package:calcolatrice/view/calculator_view.dart';
 import 'package:flutter/material.dart';
@@ -13,25 +14,27 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = darkMode();
-    return MaterialApp(
-      theme: theme,
-      home: Scaffold(
-        body: SafeArea(
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) => CalculatorBloc(),
-              ),
-              /* BlocProvider(
-                create: (context) => SubjectBloc(),
-              ), */
-            ],
-            child: CalculatorView(changeTheme: (val) {
-              theme = val == 1 ? darkMode() : lightMode();
-            }),
-          ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => CalculatorBloc(),
         ),
+        BlocProvider(
+          create: (context) => ThemeBlocBloc(),
+        ),
+      ],
+      child: BlocBuilder<ThemeBlocBloc, ThemeBlocState>(
+        builder: (context, state) {
+          return MaterialApp(
+            theme:
+                (state is ThemeBlocDark) ? state.darkMode() : state.lightMode(),
+            home: Scaffold(
+              body: SafeArea(
+                child: CalculatorView(),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
