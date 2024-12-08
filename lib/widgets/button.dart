@@ -1,5 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:calcolatrice/bloc/calculator_bloc.dart';
+import 'package:calcolatrice/blocs/calculator/calculator_bloc.dart';
 import 'package:calcolatrice/models/element.dart';
 import 'package:calcolatrice/utility.dart';
 import 'package:flutter/material.dart';

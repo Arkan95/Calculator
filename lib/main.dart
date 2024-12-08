@@ -1,5 +1,5 @@
-import 'package:calcolatrice/bloc/calculator_bloc.dart';
-import 'package:calcolatrice/bloc/theme_bloc_bloc.dart';
+import 'package:calcolatrice/blocs/calculator/calculator_bloc.dart';
+import 'package:calcolatrice/blocs/theme/theme_bloc_bloc.dart';
 import 'package:calcolatrice/theme.dart';
 import 'package:calcolatrice/view/calculator_view.dart';
 import 'package:flutter/material.dart';
