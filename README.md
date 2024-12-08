@@ -1,3 +1,3 @@
-# calcolatrice
+# Calculator
 
-A new Flutter project.
+A simple Calculator using Bloc
